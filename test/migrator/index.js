@@ -7,14 +7,13 @@ export const store = new Store();
 
 export default new Migrator({
   execMigration(id, direction) {
-    const val = parseInt(id, 10);
-    const next = direction === 'up' ? val + 1 : val - 1;
-    store.version = next.toString();
+    const next = direction === 'up' ? id : (id - 1).toString();
+    store.setVersion(next === '0' ? undefined : next);
     return Promise.resolve();
   },
 
   getLastExecuted() {
-    return Promise.resolve(store.version);
+    return Promise.resolve(store.getVersion());
   },
 
   getMigrations() {

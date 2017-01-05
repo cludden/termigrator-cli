@@ -1,10 +1,12 @@
 
 export default class Store {
-  get version() {
-    return this.version;
-  }
+  constructor() {
+    let version;
 
-  set version(id) {
-    this.version = id;
+    this.setVersion = (id) => {
+      version = id === undefined ? undefined : id;
+    };
+
+    this.getVersion = () => version;
   }
 }
