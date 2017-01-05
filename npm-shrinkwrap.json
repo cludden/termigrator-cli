@@ -1,6 +1,6 @@
 {
   "name": "termigrator-cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "dependencies": {
     "bluebird": {
       "version": "3.4.7",
