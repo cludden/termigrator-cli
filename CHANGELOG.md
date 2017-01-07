@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/cludden/termigrator-cli/compare/v0.2.2...v0.2.3) (2017-01-07)
+
+
+### Bug Fixes
+
+* **start:** fix issue with command line args on start ([fc6201a](https://github.com/cludden/termigrator-cli/commit/fc6201a))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/cludden/termigrator-cli/compare/v0.2.1...v0.2.2) (2017-01-07)
 
