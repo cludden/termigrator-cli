@@ -7,6 +7,7 @@
     "build": "rm -rf dist && mkdir dist && babel lib -d dist",
     "coverage": "./node_modules/.bin/babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha test/tests/*.test.js -- --timeout 30000",
     "postversion": "npm run build",
+    "release": "standard-version",
     "test": "mocha --compilers js:babel-register test/tests/*.test.js --timeout 30000"
   },
   "keywords": [
@@ -44,6 +45,7 @@
     "sinon": "^1.17.7",
     "sinon-as-promised": "^4.0.2",
     "sinon-chai": "^2.8.0",
+    "standard-version": "^4.0.0",
     "termigrator": "^1.0.0"
   },
   "peerDependencies": {
