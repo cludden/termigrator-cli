@@ -1,13 +1,13 @@
 {
   "name": "termigrator-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "cli for termigrator",
   "main": "./dist/index.js",
   "scripts": {
     "build": "rm -rf dist && mkdir dist && babel lib -d dist",
     "coverage": "./node_modules/.bin/babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha test/tests/*.test.js -- --timeout 30000",
     "postversion": "npm run build",
-    "release": "standard-version",
+    "release": "npm run build && standard-version",
     "test": "mocha --compilers js:babel-register test/tests/*.test.js --timeout 30000"
   },
   "keywords": [
