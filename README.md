@@ -41,6 +41,24 @@ cli.start()
 
 
 
+## Configuration
+if the migrator instance requires some configuration, use `createMigrator` instead of passing in a migrator instance
+```javascript
+import Cli from 'termigrator-cli'
+
+import migrator from './path/to/migrator'
+import pkg from '../package.json'
+
+export default new Cli({
+  version: pkg.version,
+  createMigrator() {
+
+  }
+})
+```
+
+
+
 ## CLI
 Basic usage
 ```bash
