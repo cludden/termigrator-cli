@@ -1,6 +1,6 @@
 import Bluebird from 'bluebird';
 import { expect } from 'chai';
-import { afterEach, describe, it } from 'mocha';
+import { describe, it } from 'mocha';
 import sinon from 'sinon';
 
 import Cli from '../../lib/index';
@@ -11,7 +11,7 @@ const cli = new Cli({ version: '1.0.0', migrator });
 function sendLine(line) {
   setTimeout(function () {
     process.stdin.emit('data', `${line}\n`);
-  }, 100);
+  }, 200);
 }
 
 describe('Cli', function () {
@@ -159,40 +159,36 @@ describe('Cli', function () {
   describe('#createMigrator', function () {
     it('synchronous', function () {
       return new Bluebird((resolve) => {
-        const initialize = sinon.stub();
-        const testCli = new Cli({
-          version: '1',
-          initialize,
-          createMigrator() {
-            return migrator;
-          },
-        });
-        testCli.once('down', () => {
-          expect(initialize.callCount).to.equal(1);
-          expect(testCli.migrator).to.equal(migrator);
+        cli.initialize = sinon.stub();
+        cli.createMigrator = function createMigrator() {
+          return migrator;
+        };
+        cli.once('down', () => {
+          expect(cli.initialize.callCount).to.equal(1);
+          expect(cli.migrator).to.equal(migrator);
           resolve();
         });
-        testCli.start(['node', 'test', 'down', '--to', '4']);
+        cli.start(['node', 'test', 'down', '--to', '4']);
         sendLine('yes');
       });
     });
 
     it('asynchronous', function () {
       return new Bluebird((resolve) => {
-        const initialize = sinon.stub();
-        const testCli = new Cli({
-          version: '1',
-          initialize,
-          createMigrator() {
-            return Promise.resolve(migrator);
-          },
-        });
-        testCli.once('up', () => {
-          expect(initialize.callCount).to.equal(1);
-          expect(testCli.migrator).to.equal(migrator);
+        cli.initialize = sinon.stub();
+        cli.createMigrator = function createMigrator() {
+          return new Promise((_resolve) => {
+            setTimeout(() => {
+              _resolve(migrator);
+            }, 0);
+          });
+        };
+        cli.once('up', () => {
+          expect(cli.initialize.callCount).to.equal(1);
+          expect(cli.migrator).to.equal(migrator);
           resolve();
         });
-        testCli.start(['node', 'test', 'up']);
+        cli.start(['node', 'test', 'up', '--to', '5']);
         sendLine('yes');
       });
     });
