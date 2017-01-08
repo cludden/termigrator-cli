@@ -23,10 +23,10 @@
   "dependencies": {
     "bluebird": "^3.4.1",
     "colors": "^1.1.2",
-    "commander": "^2.9.0",
     "promptly": "^2.1.0",
     "retry": "^0.10.0",
-    "source-map-support": "^0.4.8"
+    "source-map-support": "^0.4.8",
+    "yargs": "^6.6.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
