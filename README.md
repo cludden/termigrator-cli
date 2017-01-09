@@ -1,5 +1,5 @@
 # termigrator-cli
-a CLI tool for [termigrator](https://github.com/cludden/termigrator) migration apps.
+a CLI tool (using [yargs](http://yargs.js.org/)) for [termigrator](https://github.com/cludden/termigrator) migration apps.
 
 
 
@@ -23,10 +23,6 @@ import pkg from '../package.json'
 export default new Cli({
   version: pkg.version,
   migrator,
-  initialize() {
-    // do any initializing tasks here (connect to db, check tables, etc)
-    return Promise.resolve()
-  }
 })
 ```
 
@@ -35,24 +31,54 @@ export default new Cli({
 ```javascript
 #!/usr/local/env node
 
-var cli = require('../dist/cli')
-cli.start()
+require('../dist/cli').start()
+```
+
+- update the file permissions to make it executable
+
+```bash
+chmod +x ./bin/your-app-name
+```
+
+- add npm bin entry to `package.json`
+
+```json
+{
+  "bin": "./bin/your-app-name"
+}
 ```
 
 
 
 ## Configuration
-if the migrator instance requires some configuration, use `createMigrator` instead of passing in a migrator instance
+Both the CLI and migrator can be configured using the `configure` and `createMigrator` hooks.
 ```javascript
 import Cli from 'termigrator-cli'
 
-import migrator from './path/to/migrator'
+import createMigrator from './path/to/migrator'
 import pkg from '../package.json'
 
 export default new Cli({
   version: pkg.version,
-  createMigrator() {
 
+  // define a #configure method that receives the yargs instance
+  configure(yargs) {
+    return yargs.options({
+      foo: {
+        alias: 'f',
+        describe: 'my custom global option',
+        demand: true,
+        global: true,
+        default: 'bar'
+      }
+    })
+  },
+
+  // define a #createMigrator method (instead of passing in the migrator) that
+  // receives the parsed argv instance from yargs and should return a valid
+  // migrator or a promise that resolves to a valid migrator
+  createMigrator(argv) {
+    return createMigrator(argv.foo)
   }
 })
 ```
@@ -75,7 +101,7 @@ List the last executed migration
 
 ### down
 ```bash
-$ your-app-name down
+$ your-app-name down <version>
 ```
 Run migrations in the *down* direction
 
@@ -88,7 +114,7 @@ Run migrations in the *down* direction
 
 ### exec
 ```bash
-$ your-app-name exec <id> <method>
+$ your-app-name exec <version> <direction>
 ```
 Execute a single migration method
 
@@ -101,7 +127,7 @@ Execute a single migration method
 
 ### goto
 ```bash
-$ your-app-name goto <id>
+$ your-app-name goto <version>
 ```
 go from the current state to the specified state (in either direction)
 
@@ -117,7 +143,7 @@ List all pending migrations for the current environment
 
 ### up
 ```bash
-$ your-app-name up
+$ your-app-name up [version]
 ```
 Run pending migrations in the *up* direction
 
