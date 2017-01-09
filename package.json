@@ -1,6 +1,6 @@
 {
   "name": "termigrator-cli",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "cli for termigrator",
   "main": "./dist/index.js",
   "scripts": {
