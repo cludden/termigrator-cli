@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/cludden/termigrator-cli/compare/v0.2.3...v0.3.0) (2017-01-09)
+
+
+### Features
+
+* **yargs:** refactors cli to use yargs to allow for easier CLI configuration ([55eb3da](https://github.com/cludden/termigrator-cli/commit/55eb3da))
+
+
+
 <a name="0.2.3"></a>
 ## [0.2.3](https://github.com/cludden/termigrator-cli/compare/v0.2.2...v0.2.3) (2017-01-07)
 

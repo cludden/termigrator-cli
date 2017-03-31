@@ -6,7 +6,10 @@ import sinon from 'sinon';
 import Cli from '../../lib/index';
 import migrator, { migrations, store } from '../migrator';
 
-const cli = new Cli({ version: '1.0.0', migrator });
+
+function exec(cli, args) {
+  return cli.start(args);
+}
 
 function sendLine(line) {
   setTimeout(function () {
@@ -15,13 +18,21 @@ function sendLine(line) {
 }
 
 describe('Cli', function () {
+  const cli = new Cli({
+    version: '1.0.0',
+    configure(yargs) {
+      return yargs.exitProcess(false).reset();
+    },
+    migrator,
+  });
+
   it('current', function () {
     return new Bluebird((resolve) => {
       cli.once('current', function (current) {
         expect(current).to.equal(undefined);
         resolve();
       });
-      cli.start(['node', 'test', 'current']);
+      exec(cli, ['current']);
     });
   });
 
@@ -31,7 +42,7 @@ describe('Cli', function () {
         expect(pending).to.deep.equal(migrations);
         resolve();
       });
-      cli.start(['node', 'test', 'pending']);
+      exec(cli, ['pending']);
     });
   });
 
@@ -41,7 +52,7 @@ describe('Cli', function () {
         expect(executed).to.deep.equal([]);
         resolve();
       });
-      cli.start(['node', 'test', 'up']);
+      exec(cli, ['up']);
       sendLine('no');
     });
   });
@@ -52,13 +63,13 @@ describe('Cli', function () {
         expect(executed).to.deep.equal(migrations);
         resolve();
       });
-      cli.start(['node', 'test', 'up']);
+      exec(cli, ['up']);
       sendLine('yes');
     });
   });
 
-  it('down (missing --to)', function () {
-    return cli.start(['node', 'test', 'down'])
+  it('down (missing version)', function () {
+    return Bluebird.try(() => exec(cli, ['down']))
     .then(() => {
       throw new Error('SHOULD FAIL');
     })
@@ -70,39 +81,50 @@ describe('Cli', function () {
     });
   });
 
-  it('down --to BEGINNING (not confirmed)', function () {
+  it('down BEGINNING (not confirmed)', function () {
     return new Bluebird((resolve) => {
       cli.once('down', (executed) => {
         expect(executed).to.deep.equal([]);
         expect(store.getVersion()).to.equal(migrations[migrations.length - 1], 10);
         resolve();
       });
-      cli.start(['node', 'test', 'down', '--to', 'BEGINNING']);
+      exec(cli, ['down', 'BEGINNING']);
       sendLine('no');
     });
   });
 
-  it('down --to BEGINNING (confirmed)', function () {
+  it('down BEGINNING (confirmed)', function () {
     return new Bluebird((resolve) => {
       cli.once('down', (executed) => {
         expect(executed).to.deep.equal(migrations.slice().reverse());
         expect(store.getVersion()).to.equal(undefined);
         resolve();
       });
-      cli.start(['node', 'test', 'down', '--to', 'BEGINNING']);
+      exec(cli, ['down', 'BEGINNING']);
       sendLine('yes');
     });
   });
 
-  it('up --to 2 (confirmed)', function () {
+  it('up 2 (confirmed)', function () {
     return new Bluebird((resolve) => {
       cli.once('up', (executed) => {
         expect(executed).to.deep.equal(['1', '2']);
         expect(store.getVersion()).to.equal('2');
         resolve();
       });
-      cli.start(['node', 'test', 'up', '--to', '2']);
+      exec(cli, ['up', '2']);
       sendLine('yes');
+    });
+  });
+
+  it('up 2 (nothing to execute)', function () {
+    return new Bluebird((resolve) => {
+      cli.once('up', (executed) => {
+        expect(executed).to.deep.equal([]);
+        expect(store.getVersion()).to.equal('2');
+        resolve();
+      });
+      exec(cli, ['up', '2']);
     });
   });
 
@@ -113,7 +135,7 @@ describe('Cli', function () {
         expect(store.getVersion()).to.equal('2');
         resolve();
       });
-      cli.start(['node', 'test', 'goto', '4']);
+      exec(cli, ['goto', '4']);
       sendLine('no');
     });
   });
@@ -125,7 +147,7 @@ describe('Cli', function () {
         expect(store.getVersion()).to.equal('4');
         resolve();
       });
-      cli.start(['node', 'test', 'goto', '4']);
+      exec(cli, ['goto', '4']);
       sendLine('yes');
     });
   });
@@ -138,7 +160,7 @@ describe('Cli', function () {
         expect(store.getVersion()).to.equal('4');
         resolve();
       });
-      cli.start(['node', 'test', 'exec', '5', 'up']);
+      exec(cli, ['exec', '5', 'up']);
       sendLine('no');
     });
   });
@@ -151,44 +173,56 @@ describe('Cli', function () {
         expect(store.getVersion()).to.equal('5');
         resolve();
       });
-      cli.start(['node', 'test', 'exec', '5', 'up']);
+      exec(cli, ['exec', '5', 'up']);
       sendLine('yes');
     });
   });
 
   describe('#createMigrator', function () {
     it('synchronous', function () {
-      return new Bluebird((resolve) => {
-        cli.initialize = sinon.stub();
-        cli.createMigrator = function createMigrator() {
+      const options = {
+        createMigrator() {
           return migrator;
-        };
-        cli.once('down', () => {
-          expect(cli.initialize.callCount).to.equal(1);
-          expect(cli.migrator).to.equal(migrator);
+        },
+      };
+      const sandbox = sinon.sandbox.create();
+      sandbox.spy(migrator, 'down');
+      sandbox.spy(options, 'createMigrator');
+      return new Bluebird((resolve) => {
+        const testCli = new Cli(options);
+        testCli.once('down', () => {
+          expect(options.createMigrator.callCount).to.equal(1);
+          expect(migrator.down.callCount).to.equal(1);
+          sandbox.restore();
           resolve();
         });
-        cli.start(['node', 'test', 'down', '--to', '4']);
+        exec(testCli, ['down', '4']);
         sendLine('yes');
       });
     });
 
     it('asynchronous', function () {
-      return new Bluebird((resolve) => {
-        cli.initialize = sinon.stub();
-        cli.createMigrator = function createMigrator() {
+      const options = {
+        createMigrator() {
           return new Promise((_resolve) => {
             setTimeout(() => {
               _resolve(migrator);
             }, 0);
           });
-        };
-        cli.once('up', () => {
-          expect(cli.initialize.callCount).to.equal(1);
-          expect(cli.migrator).to.equal(migrator);
+        },
+      };
+      const sandbox = sinon.sandbox.create();
+      sandbox.spy(migrator, 'up');
+      sandbox.spy(options, 'createMigrator');
+      return new Bluebird((resolve) => {
+        const testCli = new Cli(options);
+        testCli.once('up', () => {
+          expect(options.createMigrator.callCount).to.equal(1);
+          expect(migrator.up.callCount).to.equal(1);
+          sandbox.restore();
           resolve();
         });
-        cli.start(['node', 'test', 'up', '--to', '5']);
+        exec(testCli, ['up', '5']);
         sendLine('yes');
       });
     });
