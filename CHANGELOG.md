@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/cludden/termigrator-cli/compare/v0.3.0...v0.3.1) (2017-05-16)
+
+
+### Bug Fixes
+
+* refactor #up() to use #getGotoVersions() to replace faulty pending logic ([76fe9f2](https://github.com/cludden/termigrator-cli/commit/76fe9f2))
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/cludden/termigrator-cli/compare/v0.2.3...v0.3.0) (2017-01-09)
 
