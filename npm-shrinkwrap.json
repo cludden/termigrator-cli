@@ -1,6 +1,6 @@
 {
   "name": "termigrator-cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "dependencies": {
     "abbrev": {
       "version": "1.0.9",
@@ -2533,38 +2533,6 @@
           "version": "2.0.0",
           "from": "string-width@>=2.0.0 <3.0.0",
           "resolved": "https://registry.npmjs.org/string-width/-/string-width-2.0.0.tgz",
-          "dev": true
-        }
-      }
-    },
-    "termigrator": {
-      "version": "1.1.4",
-      "from": "termigrator@latest",
-      "resolved": "https://registry.npmjs.org/termigrator/-/termigrator-1.1.4.tgz",
-      "dev": true,
-      "dependencies": {
-        "bluebird": {
-          "version": "3.4.1",
-          "from": "bluebird@latest",
-          "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.4.1.tgz",
-          "dev": true
-        },
-        "retry": {
-          "version": "0.10.0",
-          "from": "retry@latest",
-          "resolved": "https://registry.npmjs.org/retry/-/retry-0.10.0.tgz",
-          "dev": true
-        },
-        "source-map": {
-          "version": "0.5.6",
-          "from": "source-map@>=0.5.0 <0.6.0",
-          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.5.6.tgz",
-          "dev": true
-        },
-        "source-map-support": {
-          "version": "0.4.8",
-          "from": "source-map-support@latest",
-          "resolved": "https://registry.npmjs.org/source-map-support/-/source-map-support-0.4.8.tgz",
           "dev": true
         }
       }
