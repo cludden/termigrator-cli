@@ -8,7 +8,7 @@
     "coverage": "./node_modules/.bin/babel-node ./node_modules/.bin/babel-istanbul cover ./node_modules/.bin/_mocha test/tests/*.test.js -- --timeout 30000",
     "postversion": "npm run build",
     "release": "npm run build && standard-version",
-    "test": "mocha --compilers js:babel-register test/tests/*.test.js --timeout 30000"
+    "test": "mocha --compilers js:babel-register test/tests/*.test.js --timeout 5000"
   },
   "keywords": [
     "termigrator",
@@ -26,6 +26,7 @@
     "promptly": "^2.1.0",
     "retry": "^0.10.0",
     "source-map-support": "^0.4.8",
+    "termigrator": "^1.1.5",
     "yargs": "^6.6.0"
   },
   "devDependencies": {

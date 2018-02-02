@@ -70,15 +70,15 @@ describe('Cli', function () {
 
   it('down (missing version)', function () {
     return Bluebird.try(() => exec(cli, ['down']))
-    .then(() => {
-      throw new Error('SHOULD FAIL');
-    })
-    .catch((err) => {
-      if (err.message === 'SHOULD FAIL') {
-        throw err;
-      }
-      expect(err).to.be.an('error');
-    });
+      .then(() => {
+        throw new Error('SHOULD FAIL');
+      })
+      .catch((err) => {
+        if (err.message === 'SHOULD FAIL') {
+          throw err;
+        }
+        expect(err).to.be.an('error');
+      });
   });
 
   it('down BEGINNING (not confirmed)', function () {
@@ -175,6 +175,51 @@ describe('Cli', function () {
       });
       exec(cli, ['exec', '5', 'up']);
       sendLine('yes');
+    });
+  });
+
+  it('down BEGINNING (autoconfirmed)', function () {
+    return new Bluebird((resolve) => {
+      cli.once('down', (executed) => {
+        expect(executed).to.deep.equal(migrations.slice().reverse());
+        expect(store.getVersion()).to.equal(undefined);
+        resolve();
+      });
+      exec(cli, ['down', 'BEGINNING', '-y']);
+    });
+  });
+
+  it('up 5 (autoconfirmed)', function () {
+    return new Bluebird((resolve) => {
+      cli.once('up', (executed) => {
+        expect(executed).to.deep.equal(migrations.slice());
+        expect(store.getVersion()).to.equal('5');
+        resolve();
+      });
+      exec(cli, ['up', '5', '-y']);
+    });
+  });
+
+  it('goto 4 (autoconfirmed)', function () {
+    return new Bluebird((resolve) => {
+      cli.once('goto', (executed) => {
+        expect(executed).to.deep.equal(['5']);
+        expect(store.getVersion()).to.equal('4');
+        resolve();
+      });
+      exec(cli, ['goto', '4', '-y']);
+    });
+  });
+
+  it('exec 5 up (confirmed)', function () {
+    return new Bluebird((resolve) => {
+      cli.once('exec', (executed, direction) => {
+        expect(executed).to.equal('5');
+        expect(direction).to.equal('up');
+        expect(store.getVersion()).to.equal('5');
+        resolve();
+      });
+      exec(cli, ['exec', '5', 'up', '-y']);
     });
   });
 
